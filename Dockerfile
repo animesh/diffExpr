@@ -21,7 +21,7 @@ RUN apt-get update && \
 
 # copy necessary files
 ## app folder
-COPY /shiny_geocode ./app
+COPY /diffExpr ./app
 ## renv.lock file
 COPY /renv.lock ./renv.lock
 

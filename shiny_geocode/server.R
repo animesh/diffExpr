@@ -1,17 +1,7 @@
-
 library("shiny")
 library("tidyverse")
 library("readxl")
-library("ggmap")
 library("shinyalert")
-
-# load country list once
-data("countryExData", package = "rworldmap")
-countries<- countryExData[, 2]
-
-# add API key
-ggmap::register_google(key=Sys.getenv("API_KEY"))
-
 
 # Define server logic
 server <- function(input, output) {
@@ -73,8 +63,8 @@ server <- function(input, output) {
     observeEvent(data_file(), once = TRUE, {
         req(data_file())
         shinyalert(
-            title = "Welcome",
-            text = paste("Your uploaded dataset has", row_number(), "entries. Please note that the number of geocoded addresses is limited per day.<br>Generally, you can not geocode files with more than 10000 addresses.<br>If you wish to geocode more addresses use the contact in the header bar to reach out."),
+            title = "Check",
+            text = paste("uploaded dataset has", row_number(), "entries"),
             size = "s", 
             closeOnEsc = TRUE,
             closeOnClickOutside = TRUE,
@@ -91,65 +81,38 @@ server <- function(input, output) {
     })
     
     # make Input filter pop up when data was uploaded
-    output$address <- renderUI({
+    output$ID <- renderUI({
         req(data_file())
-        selectInput("address", "Street (+ House Number)", choices= c("", names(data_file())), width='40%', selected = "")
+        selectInput("ID",choices= c("", names(data_file())), width='40%', selected = "")
     })
     
-    output$zip <- renderUI({
+    output$pathway <- renderUI({
         req(data_file())
-        selectInput("zip", "ZIP", choices= c("", names(data_file())), width='40%', selected = "")
+        selectInput("Pathway", choices= c("", names(data_file())), width='40%', selected = "")
     })
-    
-    output$city <- renderUI({
-        req(data_file())
-        selectInput("city", "City", choices= c("", names(data_file())), width='40%', selected = "")
-    })
-    
-    output$country <- renderUI({
-        req(data_file())
-        selectInput("country", "Country", choices= c("", names(data_file())), width='40%', selected = "")
-    })
-    
-    
-    output$country_list <- renderUI({
-        req(data_file())
-        selectInput("country_list", "OR choose one country from list", choices= c("", countries), width='40%',
-                    selected = "", selectize = TRUE, multiple= FALSE)
-    })
-    
     # render start button
     output$start_button <- renderUI({
         req(data_file())
-        actionButton("start", "Start geocoding", style= "background-color: #00ffd5")
+        actionButton("start", "Start pathway mapping", style= "background-color: #00ffd5")
     })
     
     # on button click check consistency
     check_df_message <- eventReactive(eventExpr = input$start, label="button_react_addresspaste", valueExpr = {
         req(data_file())
         if (row_number() > 10000) {
-            "<span style=\"color:red\">Error: More than 10000 address entries can not be geocoded</span>"
+            "<span style=\"color:red\">Error: More than 10000 entries can not be coded</span>"
         }
-        else if (input$zip == "" & input$city == ""){
-            "<span style=\"color:red\">Error: City or ZIP column required</span>"
+        else if (input$ID == "" & input$pathway == ""){
+            "<span style=\"color:red\">Error: ID or pathway column required</span>"
         }
-        else if (input$country == "" & input$country_list == ""){
-            "<span style=\"color:red\">Error: Country column or country from list required</span>"
+        else if (input$ID != "" & !is.character(data_file()[[input$ID]])) {
+            "<span style=\"color:red\">Error: ID column not in character format</span>"
         }
-        else if (input$address != "" & !is.character(data_file()[[input$address]])) {
-            "<span style=\"color:red\">Error: Street column not in character format</span>"
-        }
-        else if (input$zip != "" & !is.character(data_file()[[input$zip]])) {
-            "<span style=\"color:red\">Error: ZIP column not in character format</span>"
-        }
-        else if (input$city != "" & !is.character(data_file()[[input$city]])) {
-            "<span style=\"color:red\">Error: City column not in character format</span>"
-        }
-        else if (input$country != "" & !is.character(data_file()[[input$country]])) {
-            "<span style=\"color:red\">Error: Country column not in character format</span>"
+        else if (input$pathway != "" & !is.character(data_file()[[input$pathway]])) {
+            "<span style=\"color:red\">Error: pathway column not in character format</span>"
         }
         else {
-            "<span style=\"color:green\">Geocoding finished</span>"
+            "<span style=\"color:green\">coding finished</span>"
         }
         
     })
@@ -161,10 +124,10 @@ server <- function(input, output) {
     })
     
 
-    # if input consistent, make complete adress column and geocode it
-    geocoded_data<- eventReactive(eventExpr = input$start, label="button_react_geocode", ignoreNULL = FALSE, valueExpr ={
+    # if input consistent, make complete adress column and diffExprcode it
+    coded_data<- eventReactive(eventExpr = input$start, label="button_react_diffExprcode", ignoreNULL = FALSE, valueExpr ={
         req(check_df_message())
-        if (check_df_message() == "<span style=\"color:green\">Geocoding finished</span>"){
+        if (check_df_message() == "<span style=\"color:green\">diffExprcoding finished</span>"){
           g_data <-  data_file() %>%
                
                 transmute(complete_address = paste0(
@@ -185,16 +148,14 @@ server <- function(input, output) {
                    })
                 ))
           
-          # init geocoding addresses to long lat with google maps API with progress bar
-          withProgress(message = 'Geocoding in progress', detail = '', value = 0, {
+          # init diffExprcoding addresses to long lat with google maps API with progress bar
+          withProgress(message = 'diffExprcoding in progress', detail = '', value = 0, {
             
                 gc<- map(g_data$complete_address, function(x){ 
                     
                     # incremet progress bar
                     incProgress(1/row_number())    
                     
-                    # geocode address 
-                    ggmap::geocode(x, output = "latlon")
                 })
           })
          # transform list long lat to tibble and bind to input data
@@ -206,13 +167,13 @@ server <- function(input, output) {
     
     # preview finished dataset
     output$preview_results<- renderTable({
-        req(geocoded_data())
-        return(head(geocoded_data(), 10))
+        req(coded_data())
+        return(head(coded_data(), 10))
     }, caption = "Results preview (lon/lat shortened)")
     
     # render download button
     output$download_button <- renderUI({
-        req(geocoded_data())
+        req(coded_data())
         downloadButton("downloadData", "Download", style= "background-color: #00ffd5")
     })
     
@@ -222,7 +183,7 @@ server <- function(input, output) {
         # This function returns a string which tells the client
         # browser what name to use when saving the file.
         filename = function() {
-            paste0("geocoded_addresses_", Sys.Date(), ".csv" )
+            paste0("coded_addresses_", Sys.Date(), ".csv" )
         },
         
         # This function should write data to a file given to it by
@@ -230,7 +191,7 @@ server <- function(input, output) {
         content = function(file) {
             
             # Write to a file specified by the 'file' argument
-            write_csv(geocoded_data(), file)
+            write_csv(coded_data(), file)
         }
     )
 }

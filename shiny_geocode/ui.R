@@ -5,13 +5,13 @@ library("dashboardthemes")
 
 # Define UI for application 
 ui <- dashboardPage(
-    header= dashboardHeader(title= "Batch Geocoding",
-                            tags$li(a(href = 'mailto:info@timschendzielorz.com?subject="Geocoding App"',
+    header= dashboardHeader(title= "Batch Differential Expression Analysis",
+                            tags$li(a(href = 'mailto:sharma.animesh@gmail.com?subject="Differential Expression Analysis App"',
                                       icon("envelope", "fa-2x"),
                                       title = "Contact",
                                       style = "color: #17677C; margin-top: -4px; padding-left: 4px;" ),
                                     class = "dropdown"),
-                            tags$li(a(href = 'https://www.github.com/timosch29/geocoding_shiny',
+                            tags$li(a(href = 'https://differential-expression.herokuapp.com/',
                                       icon("github", "fa-2x"), # 2x size from f
                                       title = "GitHub Repo",
                                       style = "color: #17677C; margin-top: -4px; padding-left: 4px;" ),
@@ -29,7 +29,7 @@ ui <- dashboardPage(
         shinyalert::useShinyalert(),
         shinyDashboardThemes(theme = "blue_gradient"),
         # app title 
-        titlePanel("Get longitude & latitude for an address list"),
+        titlePanel("Get ID & pathway from list"),
         column(width=4,
                fluidRow(
                    # box w/ description and upload inputs
@@ -64,17 +64,17 @@ ui <- dashboardPage(
                ), 
                box(
                    width = '100%',
-                   title= "2. Choose the address columns",
-                   "Either city or ZIP is required. A country column or a country choosen from the dropdown list is required.", br(), br(),
+                   title= "2. Choose the ID columns",
+                   "Either ID or pathway is required. A map column or a map choosen from the dropdown list is required.", br(), br(),
                    uiOutput("address"),
-                   uiOutput("zip"),
-                   uiOutput("city"),
-                   uiOutput("country"),
-                   uiOutput("country_list")
+                   uiOutput("pathway"),
+                   uiOutput("ID"),
+                   uiOutput("map"),
+                   uiOutput("map_list")
                ),
                box(
                    width = '100%',
-                   title= "3. Geocode",
+                   title= "3. Differential Expression Analysis",
                    uiOutput("start_button"),
                    htmlOutput("df_message")
                    
