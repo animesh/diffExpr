@@ -5,22 +5,14 @@ app: https://differential-expression.herokuapp.com/
 <br><br>
 source: https://github.com/animesh/scripts/blob/master/diffExprPlots.rmd 
 mailto: sharma.animesh@gmail.com?subject=%22diffExpr%20App%22
-base: https://medium.com/analytics-vidhya/deploying-an-r-shiny-app-on-heroku-free-tier-b31003858b68 
+```bash
+git clone https://github.com/animesh/diffExpr
+usethis::create_package(path = "diffExpr")
+```
+base: https://blog.simonpcouch.com/blog/r-github-actions-commit/
 
 # deps
-install.packages("renv")
-renv::restore()
-renv::activate()
-install.packages("withr")
-install.packages("shiny")
-install.packages("shinydashboard")
-install.packages("shinydashboardPlus")
-install.packages("dashboardthemes")
-install.packages("tidyverse")
-install.packages("ggmap")
-install.packages("shinyalert")
-install.packages("rworldmap")
+library(jsonlite)
 
 # run
-?register_google
-runApp('shiny_geocode')
+cron: "0 * * * *"
