@@ -12,6 +12,7 @@ usethis::create_package(path = "diffExpr")
 base: https://blog.simonpcouch.com/blog/r-github-actions-commit/
 
 # deps
+library(curl)
 library(jsonlite)
 
 # run
