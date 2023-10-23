@@ -4,13 +4,23 @@ app: Shiny/R application for differential-expression analysis using T-test based
 <br><br>
 fix: Automatically deployed via GH Actions to shinyapp.io available as https://fuzzylife.shinyapps.io/diffExpr/ using heroku deployment strategy of https://blog.simonpcouch.com/blog/r-github-actions-commit/ 
 <br><br>
-source: https://github.com/animesh/scripts/blob/master/diffExprANOVA.rmd 
+source: https://github.com/animesh/r-source/blob/master/src/library/stats/R/t.test.R
 mailto: sharma.animesh@gmail.com?subject=diffExprApp
 
 ```bash
 git clone https://github.com/animesh/diffExpr
 usethis::create_package(path = "diffExpr")
 ```
+
+tested with proteinGroups.txt from [Proteomics profiling in primary tumors of metastatic and non-metastatic breast cancers](https://www.ebi.ac.uk/pride/archive/projects/PXD037288) results
+
+```bash
+wget https://ftp.pride.ebi.ac.uk/pride/data/archive/2023/03/PXD037288/txt.zip
+unzip txt.zip
+```
+
+where *T67* is *Groups 1* is representing samples *43_|44_|45_|46_|47_|48_* (note that individual samples at separated by pipe) and samples representing *Group 2*/T66 are is *37_|38_|39_|40_|41_|42_*, the results downloaded for this comparison in above zip file proteinGroups.txtLFQ.intensity.112T67T660.050.50.05tTestBH.csv should match with the ones Downloaded from this analysis
+
 base: 
 
 # deps
@@ -20,8 +30,8 @@ library(jsonlite)
 # run
 cron: "0 * * * *"
 
-#### Server 
 o [Install](https://rstudio.com/products/shiny/download-server/ubuntu/)
+#### Server 
 ```
 sudo su - -c "R -e \"install.packages(c('ggplot2','dplyr','ggrepel','shinycssloaders','readxl','DT', 'RCurl','svglite')repos='https://cran.rstudio.com/')\""
 ```
@@ -33,8 +43,8 @@ tail -f /var/log/shiny-server/VolcaNoseR-shiny-*.log
 o The first option is running it directly from Github. In the command line (in R or Rstudio) type:
 ```
 shiny::runGitHub('VolcaNoseR', 'animesh')
-```
 o The second option is download the app and to use it offline:
+```
 
 -download the `app.R` and csv files (`Data-Vulcano-plot.csv` and `elife-45916-Cdc42QL_data.csv`) with example data.
 
