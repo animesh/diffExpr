@@ -1,80 +1,116 @@
-# Differential Expression Analysis [Protein/Gene/...] deployed via GH actions to shinyapp.io 
-<br><br>
-app: Shiny/R application for differential-expression analysis using T-test based on [VolcaNoseR](https://github.com/JoachimGoedhart/VolcaNoseR/)
-<br><br>
-fix: Automatically deployed via GH Actions to shinyapp.io available as https://fuzzylife.shinyapps.io/diffExpr/ using heroku deployment strategy of https://blog.simonpcouch.com/blog/r-github-actions-commit/ 
-<br><br>
-source: https://github.com/animesh/r-source/blob/master/src/library/stats/R/t.test.R
-mailto: sharma.animesh@gmail.com?subject=diffExprApp
 
-```bash
-git clone https://github.com/animesh/diffExpr
-usethis::create_package(path = "diffExpr")
+# Differential Expression Analysis App (Shiny)
+
+This is a Shiny/R application for differential-expression analysis using T-test, based on [VolcaNoseR](https://github.com/JoachimGoedhart/VolcaNoseR/). The app is designed for proteomics data (e.g., MaxLFQ output) and supports robust group-wise comparison, flexible column selection, and user-friendly data exploration.
+
+---
+
+## Features
+
+- Upload or use a default `proteinGroups.txt` file (tab-separated, MaxLFQ output)
+- Dynamically select columns for two groups using prefix and filter patterns
+- Default group filters for quick start (e.g., `43_|44_|45_|46_|47_|48_` and `37_|38_|39_|40_|41_|42_`)
+- Interactive selection of columns for each group
+- Real-time display of available columns and sample data
+- Row-wise t-test (via custom `testT` function) between selected groups
+- Download results with filename encoding all selection/filter parameters
+- Downloaded filename format: 
+	`proteinGroups_SEL-<selection>_G1-<group1filter>_G2-<group2filter>_testT.csv`
+	(all non-alphanumeric characters removed from selection/filter strings)
+- Interactive table, histogram, and heatmap of selected data
+
+---
+
+## Step-by-Step Usage
+
+### 1. Setup
+
+#### Requirements
+- R (>= 4.0 recommended)
+- R packages: `shiny`, `DT`, `ggplot2`, etc.
+
+#### Install dependencies
+```r
+install.packages(c('shiny', 'DT', 'ggplot2'))
 ```
 
-tested with proteinGroups.txt from [Proteomics profiling in primary tumors of metastatic and non-metastatic breast cancers](https://www.ebi.ac.uk/pride/archive/projects/PXD037288) results
+#### Clone the repository
+```bash
+git clone https://github.com/animesh/diffExpr
+cd diffExpr
+```
 
+#### (Optional) Download example data
 ```bash
 wget https://ftp.pride.ebi.ac.uk/pride/data/archive/2023/03/PXD037288/txt.zip
 unzip txt.zip
+# Place proteinGroups.txt in the app directory
 ```
 
-where *T67* is *Groups 1* is representing samples *43_|44_|45_|46_|47_|48_* (note that individual samples at separated by pipe) and samples representing *Group 2*/T66 are is *37_|38_|39_|40_|41_|42_*, the results downloaded for this comparison in above zip file proteinGroups.txtLFQ.intensity.112T67T660.050.50.05tTestBH.csv should match with the ones Downloaded from this analysis
+---
 
-base: 
+### 2. Running the App
 
-# deps
-library(curl)
-library(jsonlite)
-
-# run
-cron: "0 * * * *"
-
-o [Install](https://rstudio.com/products/shiny/download-server/ubuntu/)
-#### Server 
+In R or RStudio:
+```r
+shiny::runApp('app.R', host='0.0.0.0', port=8081)
 ```
-sudo su - -c "R -e \"install.packages(c('ggplot2','dplyr','ggrepel','shinycssloaders','readxl','DT', 'RCurl','svglite')repos='https://cran.rstudio.com/')\""
-```
-o log monitor *example*
-```
-tail -f /var/log/shiny-server/VolcaNoseR-shiny-*.log
-```
+Or click "Run App" in RStudio.
 
-o The first option is running it directly from Github. In the command line (in R or Rstudio) type:
-```
-shiny::runGitHub('VolcaNoseR', 'animesh')
-o The second option is download the app and to use it offline:
-```
+---
 
--download the `app.R` and csv files (`Data-Vulcano-plot.csv` and `elife-45916-Cdc42QL_data.csv`) with example data.
+### 3. Using the App
 
--Run RStudio and load `app.R`
+#### a. Data Input
+- By default, the app loads `proteinGroups.txt` if present.
+- You can upload your own file using the file input.
 
--Select 'Run All' (shortcut is command-option-R on a Mac) or click on "Run App" (upper right button on the window)
+#### b. Column Selection
+- **Select columns starting with**: Enter a prefix (e.g., `LFQ.intensity`) to filter columns by name.
+- **Filter columns (Group 1/2)**: Enter patterns (e.g., `43_|44_|45_|46_|47_|48_`) to further filter columns for each group. Only alphanumeric characters are used in the download filename.
+- Use the checkboxes to select/deselect columns for each group.
 
-This should launch a web browser with the Shiny app.
+#### c. Data Exploration
+- The app displays available columns and a sample row for reference.
+- Interactive table shows t-test results for each protein/row.
+- Histogram and heatmap visualizations are provided for selected data.
 
+#### d. Downloading Results
+- Click the **Download** button to save the t-test results as a CSV file.
+- The filename will encode your current selection and filter settings, e.g.:
+	`proteinGroups_SEL-LFQ_intensity_G1-434445464748_G2-373839404142_testT.csv`
 
-### Credits
+---
 
-There are several Shiny apps for Volcano plots that have served as a source of inspiration:
+## Example Workflow
 
--[VolcanoR](https://github.com/vovalive/volcanoR)
+1. Start the app and load your data.
+2. Set "Select columns starting with" to `LFQ.intensity` (or your desired prefix).
+3. Set Group 1 filter to `43_|44_|45_|46_|47_|48_` and Group 2 filter to `37_|38_|39_|40_|41_|42_` (or your sample groups).
+4. Adjust column selections as needed using the checkboxes.
+5. Review the available columns and sample data.
+6. View the t-test results, histogram, and heatmap.
+7. Click **Download** to save your results. The filename will reflect your selections.
 
--[Volcanoshiny](https://github.com/hardingnj/volcanoshiny)
+---
 
--[VolcanoPlot_shiny_app](https://github.com/stemicha/VolcanoPlot_shiny_app)
+## Notes
 
+- Only alphanumeric characters from your filter and selection inputs are used in the download filename.
+- The app is robust to missing or empty selections; error messages will guide you if no columns are selected.
+- The statistical test is performed using a custom `testT` function (see `R/test.r`).
 
-VolcaNoseR is created and maintained by Joachim Goedhart ([@joachimgoedhart](https://twitter.com/joachimgoedhart))
+---
 
-### Example output
+## Credits & Inspiration
 
-Standard output generated with the example data:
+This app is inspired by and builds on:
+- [VolcaNoseR](https://github.com/JoachimGoedhart/VolcaNoseR)
+- [VolcanoR](https://github.com/vovalive/volcanoR)
+- [Volcanoshiny](https://github.com/hardingnj/volcanoshiny)
+- [VolcanoPlot_shiny_app](https://github.com/stemicha/VolcanoPlot_shiny_app)
 
-![alt text](https://github.com/JoachimGoedhart/VolcaNoseR/blob/master/VolcaNoseR_example1.png "Output")
+Maintainer: [Animesh Sharma](mailto:sharma.animesh@gmail.com?subject=diffExprApp)
 
-Output with user selected annotation of data:
-
-![alt text](https://github.com/JoachimGoedhart/VolcaNoseR/blob/master/VolcaNoseR_example2.png "Output")
+---
 
