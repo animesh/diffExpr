@@ -19,7 +19,7 @@ library(shiny)
 #body(blTT)<-source("bottomleft.r")
 #body(blKM)[[25]][[4]]<-substitute({cat(paste0((ngenes - i), "."))})
 ui <- fluidPage(
-  titlePanel("T test over selected columns from MaxLFQ output"),
+  titlePanel("T test with FDR over log2-transform of selected columns from MaxLFQ output"),
   textInput("selection", "Select columns starting with", value = "LFQ.intensity", width = '500px', placeholder = NULL),
   fileInput("fileUp", "Upload proteinGroups.txt", multiple = FALSE,
             accept = c("text","text/tab-separated-values,text/plain",".txt"),
