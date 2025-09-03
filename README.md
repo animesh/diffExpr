@@ -1,7 +1,7 @@
 
 # Differential Expression Analysis App (Shiny)
 
-This is a Shiny/R application for differential-expression analysis using T-test followed by Benjamini Hochberg correction (FDR). The app is designed with base-R for proteomics data (MaxLFQ output) and supports quick group-wise comparison with FDR, CV, histograms, missing-value histogram and further result exploration.
+This is a Shiny/R application for differential-expression analysis using T-test followed by Benjamini Hochberg correction (FDR). The app is designed with base-R for proteomics data (MaxLFQ output) and supports quick group-wise comparison with FDR, CV, histograms, heatmap (missing-values as white) and further text-box based search result exploration.
 
 ---
 
@@ -17,27 +17,39 @@ This is a Shiny/R application for differential-expression analysis using T-test 
 - Downloaded filename format: 
 	`proteinGroups_SEL-<selection>_G1-<group1filter>_G2-<group2filter>_testT.csv`
 	(all non-alphanumeric characters removed from selection/filter strings)
-- Interactive table, histogram, and heatmap of selected data
+- Histogram and heatmap of selected data
 
 ---
 
 ## Step-by-Step Usage
 
-### 1. Setup
+## Figures Generated
 
-#### Requirements
-- R (>= 4.0 recommended)
+- **Histogram**: Distribution of the selected result column.
+- **Heatmap of Available Values**: Greyscale heatmap (black = available, white = missing/zero) of all selected columns (both groups), transposed for clarity. This helps you quickly assess which proteins/samples have complete or missing data.
+- **Volcano Plot**:  
+	- X-axis: Log2 median change between groups.  
+	- Y-axis: -log10(p-value) from the t-test.  
+	- Points: Black-to-white grayscale by corrected p-value (BH); NA values are white.  
+	- Vertical lines at x = -1 and x = 1, and a horizontal line at y = -log10(0.05), are drawn for reference.
 
-#### Install dependencies
-```r
-install.packages('shiny')
-```
+
+### Setup
 
 #### Clone the repository
 ```bash
 git clone https://github.com/animesh/diffExpr
 cd diffExpr
-Rscript -e "shiny::runApp('app.R', host='0.0.0.0', port=8081)"
+Rscript -e "shiny::runApp('app.R')"
+Loading required package: shiny
+Warning in warn_if_app_dir_is_package(appDir) :
+  Loading R/ subdirectory for Shiny application, but this directory appears to contain an R package. Sourcing files in R/ may cause unexpected behavior. See `?loadSupport` for more details.
+Listening on http://127.0.0.1:6266
+```
+
+#### Install dependencies
+```r
+install.packages('shiny')
 ```
 
 tested with proteinGroups.txt from [Proteomics profiling in primary tumors of metastatic and non-metastatic breast cancers](https://www.ebi.ac.uk/pride/archive/projects/PXD037288) results
@@ -66,10 +78,12 @@ fork: VolcaNoseR is created and maintained by Joachim Goedhart ([@joachimgoedhar
 
 ### [shiny app](https://fuzzylife.shinyapps.io/diffExpr/) running online
 
-Standard output generated with the example data:
+Standard output generated with the example data (screenshot):
+
+**Note:**
+The heatmap now displays available (non-missing, nonzero) values as black and missing/zero values as white. This is the reverse of the previous logic. The plot is titled "Heatmap of Available Values" and provides a quick visual summary of data completeness across all selected columns.
 
 
-Screenshot_2-9-2025_193514_fuzzylife.shinyapps.io.jpeg
 
-![alt text](./Screenshot_2-9-2025_193514_fuzzylife.shinyapps.io.jpeg "Output")
+![alt text](./Screenshot_3-9-2025_142747_127.0.0.1.jpeg "Output")
 
