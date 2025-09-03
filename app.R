@@ -320,24 +320,24 @@ server <- function(session,input,output) {
     output$heatmap <- renderPlot({
       if (!is.null(mat) && nrow(mat) > 1 && ncol(mat) > 1) {
         mat_num <- suppressWarnings(as.matrix(sapply(mat, as.numeric)))
-        miss_mat <- ifelse(is.na(mat_num) | mat_num == 0, 1, 0)
-        keep <- rowSums(miss_mat) > 0
-        miss_mat <- miss_mat[keep, , drop=FALSE]
-        if (nrow(miss_mat) > 1 && ncol(miss_mat) > 1) {
+        avail_mat <- ifelse(is.na(mat_num) | mat_num == 0, 0, 1)
+        keep <- rowSums(avail_mat) > 0
+        avail_mat <- avail_mat[keep, , drop=FALSE]
+        if (nrow(avail_mat) > 1 && ncol(avail_mat) > 1) {
           image(
-            x = 1:nrow(miss_mat),
-            y = 1:ncol(miss_mat),
-            z = miss_mat,
+            x = 1:nrow(avail_mat),
+            y = 1:ncol(avail_mat),
+            z = avail_mat,
             col = gray.colors(256, start=1, end=0),
             axes = FALSE,
             xlab = "Protein groups rows",
             ylab = "",
-            main = "Heatmap of Missing Values"
+            main = "Heatmap of Available Values"
           )
-          axis(2, at=1:ncol(miss_mat), labels=colnames(miss_mat), las=2, cex.axis=0.7)
+          axis(2, at=1:ncol(avail_mat), labels=colnames(avail_mat), las=2, cex.axis=0.7)
           box()
         } else {
-          plot.new(); title(main="No missing/zero values to display")
+          plot.new(); title(main="No available/nonzero values to display")
         }
       } else {
         plot.new(); title(main="Not enough data for heatmap")
@@ -387,7 +387,7 @@ server <- function(session,input,output) {
     updateSelectInput(session, "seriesR", choices = colnames(df5))
     output$hist <- renderPlot({
       if (!is.null(input$seriesR) && input$seriesR %in% colnames(df5)) {
-        hist(df5[, input$seriesR], main = input$seriesR)
+        hist(df5[, input$seriesR], main = input$seriesR,xlab=input$seriesR)
       }
     })
   })
